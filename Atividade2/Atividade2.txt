@@ -1,0 +1,2 @@
+Crie o DTD para o XML Banco.xml
+Execute o código XMLValidator. Ao executar esse código, ele deve exibir apenas a mensagem "XML de acordo com o DTD!"

@@ -1,0 +1,13 @@
+	<!ELEMENT Banco (Cliente*, Conta*)>
+	<!ELEMENT Cliente (nome,cpf,Endereco)>
+		<!ATTLIST Cliente id ID #REQUIRED>
+	<!ELEMENT Endereco (email)>
+	<!ELEMENT nome (#PCDATA)>
+	<!ELEMENT cpf (#PCDATA)>
+	<!ELEMENT email (#PCDATA)>
+	<!ELEMENT Conta (numero, tipo, saldo)>
+		<!ATTLIST Conta titular IDREFS #REQUIRED>
+	<!ELEMENT numero (#PCDATA)>
+	<!ELEMENT tipo (#PCDATA)>
+	<!ELEMENT saldo (#PCDATA)>
+
