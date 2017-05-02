@@ -9,11 +9,11 @@ package model;
  *
  * @author Jhansen
  */
-public class Sementes {
+public class Semente {
     private final String url;
     private final boolean visitado;
 
-    public Sementes(String url, boolean visitado) {
+    public Semente(String url, boolean visitado) {
         this.url = url;
         this.visitado = visitado;
     }

@@ -9,17 +9,21 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 /**
  *
  * @author Jhansen
  */
 public class Parser {
-    
+    private ArrayList<Site> sites;
     private Document doc;
-    private final ArrayList<Sementes> seeds;
+    private HashMap<String, Boolean> semes;//nem precisa da lista de seeds
+    private final ArrayList<Semente> seeds;
     
     public Parser(){
         this.seeds = new ArrayList<>();
@@ -41,6 +45,7 @@ public class Parser {
                         linha = linha.replace("</url>", "");
                         linha = linha.trim();
                         this.parserHTML(linha);
+                        System.out.println(linha);
                     }
                 }
             }
@@ -58,7 +63,11 @@ public class Parser {
         try {
             doc = (Document) Jsoup.connect(url).get();
             System.out.println(doc.title());
-            this.seeds.add(new Sementes(url, true));
+            Elements links = doc.select("a[href]");
+            for (Element link : links) {
+                System.out.println(link.attr("abs:href")+"  -  "+link.text().trim());
+            }
+            this.seeds.add(new Semente(url, true));
         } catch (IOException ex) {
             System.err.println("Erro: " + ex);
         }        

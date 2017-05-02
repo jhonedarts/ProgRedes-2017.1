@@ -10,5 +10,39 @@ package model;
  * @author Jhansen
  */
 public class Centroide {
+    private String conteudo;
+    private int peso;
+    private int ocorrencia;
+
+    public Centroide(String conteudo, int peso, int ocorrencia) {
+        this.conteudo = conteudo;
+        this.peso = peso;
+        this.ocorrencia = ocorrencia;
+    }
+
+    public String getConteudo() {
+        return conteudo;
+    }
+
+    public void setConteudo(String conteudo) {
+        this.conteudo = conteudo;
+    }
+
+    public int getPeso() {
+        return peso;
+    }
+
+    public void setPeso(int peso) {
+        this.peso = peso;
+    }
+
+    public int getOcorrencia() {
+        return ocorrencia;
+    }
+
+    public void setOcorrencia(int ocorrencia) {
+        this.ocorrencia = ocorrencia;
+    }
+    
     
 }
