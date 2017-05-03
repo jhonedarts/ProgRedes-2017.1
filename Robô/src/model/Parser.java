@@ -21,14 +21,14 @@ import org.jsoup.select.Elements;
  * @author Jhansen
  */
 public class Parser {
-    private String tags[] = {"p","h3","head"};
+    private String tags[] = {"title","h4","strong"};
     private ArrayList<Site> sites;
     private Document doc;
     private HashMap<String, Boolean> stoplist;//nem precisa da lista de seeds
     private final ArrayList<Semente> seeds;
     
     public Parser() throws IOException{
-        BufferedReader sourceBr = new BufferedReader(new FileReader(new File("stoplist.txt")));
+        BufferedReader sourceBr = new BufferedReader(new FileReader(new File("stoplist.txt"))); //tem que ler em UTF-8
         String line;
         stoplist = new HashMap();
         while ((line = sourceBr.readLine()) != null) {
@@ -100,13 +100,13 @@ public class Parser {
     
     private void getCentroide(String txt){
         HashMap<String, Centroide> words = new HashMap();
-        String palavras[] = txt.split("\\s+|\\n+|\\t+|\\r+|\\.+|\\,+|\\;+|\\:+|\\(+|\\)+|#+|\"+|'+|[+|]+|");
+        String palavras[] = txt.split("\\s+|\\n+|\\t+|\\r+|\\.+|\\,+|\\;+|\\:+|\\(+|\\)+|#+|\"+|'+|[+|]+");
                 //+ "issimo|íssimo|issimos|íssimos|issima|íssima|issimas|íssimas|manha|manhã|noite|exemplo|minutos|segundos");
         for(String str:palavras){
             str =str.trim();
             Centroide cent = words.get(str);
             Boolean stopLContains = stoplist.get(str);
-            if (!stopLContains){ //se nao está na stoplist
+            if (stopLContains == null && str.isEmpty()){ //se nao está na stoplist
                 if(cent==null){//se não esta na lista de centroides
                     cent = new Centroide(str, 0, 1);
                     words.put(str, cent);
@@ -118,7 +118,9 @@ public class Parser {
             }
             //hasmap de words populada, vamos agora atribuir os pesos
             for(int i=0;i<tags.length;i++){
-                String aux[] = doc.//receber um vetor de Strings das palavras que tem na tag html na posição i de tags
+                Element e = doc.tagName(tags[i]);//receber um vetor de Strings das palavras que tem na tag html na posição i de tags
+                //System.out.println(e);
+                //checar se e contains str e atribuir o peso
             }
         }
     }
