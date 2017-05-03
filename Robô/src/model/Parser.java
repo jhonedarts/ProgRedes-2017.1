@@ -26,7 +26,7 @@ public class Parser {
     private Document doc;
     private HashMap<String, Boolean> stoplist;//nem precisa da lista de seeds
     private final ArrayList<Semente> seeds;
-    
+    private int numTermos = 0;
     public Parser() throws IOException{
         BufferedReader sourceBr = new BufferedReader(new FileReader(new File("stoplist.txt"))); //tem que ler em UTF-8
         String line;
@@ -47,6 +47,7 @@ public class Parser {
         }
         sourceBr.close();
         this.seeds = new ArrayList<>();
+        this.sites = new ArrayList<Site>();
     }
     /**
      * Método para abrir o arquivo XML e extrair as url's
@@ -64,7 +65,7 @@ public class Parser {
                         linha = linha.replace("<url>", "");
                         linha = linha.replace("</url>", "");
                         linha = linha.trim();
-                        this.parserHTML(linha);
+                        seeds.add(new Semente(linha, false));
                         System.out.println(linha);
                     }
                 }
@@ -73,6 +74,14 @@ public class Parser {
         } catch (IOException e) {
             System.err.println("Erro: " + e);
         }
+        
+        for (int index = 0; index < seeds.size(); index++) {
+            parserHTML(seeds.get(index).getUrl());  
+            if(index==4){
+                break;
+            }
+        }
+        //salvar sites em xml, ou bin se nada der certo
     }
     /**
      * Método responsável por fazer o parser na página HTML
@@ -86,8 +95,11 @@ public class Parser {
             Elements links = doc.select("a[href]");
             for (Element link : links) {
                 System.out.println(link.attr("abs:href")+"  -  "+link.text().trim());
+                this.seeds.add(new Semente(link.attr("abs:href"), false));
             }
-            getCentroide(doc.text());
+            HashMap<String, Centroide> words = getCentroide(doc.text());
+            Site site = new Site(doc.title(),doc.text(),words.size(), numTermos, words);
+            sites.add(site);
             this.seeds.add(new Semente(url, true));
         } catch (IOException ex) {
             System.err.println("Erro: " + ex);
@@ -98,12 +110,14 @@ public class Parser {
         System.out.println(seeds.toString());
     }
     
-    private void getCentroide(String txt){
+    private HashMap<String, Centroide> getCentroide(String txt){
         HashMap<String, Centroide> words = new HashMap();
-        String palavras[] = txt.split("\\s+|\\n+|\\t+|\\r+|\\.+|\\,+|\\;+|\\:+|\\(+|\\)+|#+|\"+|'+|[+|]+");
+        numTermos = 0;
+        String palavras[] = txt.split("' '+|\\n+|\\t+|\\r+|\\.+|\\,+|\\;+|\\:+|\\(+|\\)+|#+|\"+|'+|[+|]+");
                 //+ "issimo|íssimo|issimos|íssimos|issima|íssima|issimas|íssimas|manha|manhã|noite|exemplo|minutos|segundos");
         for(String str:palavras){
             str =str.trim();
+            numTermos++;
             Centroide cent = words.get(str);
             Boolean stopLContains = stoplist.get(str);
             if (stopLContains == null && str.isEmpty()){ //se nao está na stoplist
@@ -118,10 +132,15 @@ public class Parser {
             }
             //hasmap de words populada, vamos agora atribuir os pesos
             for(int i=0;i<tags.length;i++){
-                Element e = doc.tagName(tags[i]);//receber um vetor de Strings das palavras que tem na tag html na posição i de tags
-                //System.out.println(e);
-                //checar se e contains str e atribuir o peso
+                Element e = doc.tagName("title");//receber um vetor de Strings das palavras que tem na tag html na posição i de tags
+                
+                //System.out.println(doc.absUrl("title"));
+                //checar cada palavra de retorno do metodo que pega az palavraz contidaz na tag
+                //checar na lizta de palavraz filtradaz, ze conter atribui o pezo
+                
             }
+            //return centroide
         }
+        return words;
     }
 }

@@ -1,9 +1,12 @@
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 package model;
+
+import java.util.HashMap;
 
 /**
  *
@@ -14,15 +17,20 @@ public class Site {
     private String texto;
     private int numTermosDif;
     private int numTermos;
-    private Centroide centroide;
+    HashMap<String, Centroide> termos;
 
-    public Site(String titulo, String texto, int numTermosDif, int numTermos, Centroide centroide) {
+    public Site(String titulo, String texto, int numTermosDif, int numTermos, HashMap<String, Centroide> termos) {
         this.titulo = titulo;
         this.texto = texto;
         this.numTermosDif = numTermosDif;
         this.numTermos = numTermos;
-        this.centroide = centroide;
+        this.termos = termos;
     }
+
+    public Site() {
+    }
+    
+    
 
     public String getTitulo() {
         return titulo;
@@ -56,12 +64,12 @@ public class Site {
         this.numTermos = numTermos;
     }
 
-    public Centroide getCentroide() {
-        return centroide;
+    public HashMap<String, Centroide> getCentroide() {
+        return termos;
     }
 
-    public void setCentroide(Centroide centroide) {
-        this.centroide = centroide;
+    public void setCentroide(HashMap<String, Centroide> centroide) {
+        this.termos = centroide;
     }
     
     
