@@ -10,7 +10,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author jmalmeida
+ * @author Jhansen e Jhone
  */
 public class Site {
     private String titulo;

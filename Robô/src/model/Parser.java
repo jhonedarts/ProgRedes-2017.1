@@ -18,10 +18,10 @@ import org.jsoup.select.Elements;
 
 /**
  *
- * @author Jhansen
+ * @author Jhansen e Jhone
  */
 public class Parser {
-    private String tags[] = {"title","h4","strong"};
+    private HashMap<String, Integer> tags;
     private ArrayList<Site> sites;
     private Document doc;
     private HashMap<String, Boolean> stoplist;//nem precisa da lista de seeds
@@ -48,6 +48,12 @@ public class Parser {
         sourceBr.close();
         this.seeds = new ArrayList<>();
         this.sites = new ArrayList<Site>();
+        this.tags = new HashMap();
+        tags.put("title", 10);
+        tags.put("h1", 3);
+        tags.put("h2", 3);
+        tags.put("span", 3);
+        tags.put("div", 1);
     }
     /**
      * Método para abrir o arquivo XML e extrair as url's
@@ -66,7 +72,7 @@ public class Parser {
                         linha = linha.replace("</url>", "");
                         linha = linha.trim();
                         seeds.add(new Semente(linha, false));
-                        System.out.println(linha);
+                        //System.out.println(linha);
                     }
                 }
             }
@@ -77,6 +83,8 @@ public class Parser {
         
         for (int index = 0; index < seeds.size(); index++) {
             parserHTML(seeds.get(index).getUrl());  
+            seeds.get(index).setVisitado(true);
+            System.out.println(seeds.get(index).getUrl()+" - visitado");
             if(index==4){
                 break;
             }
@@ -91,16 +99,17 @@ public class Parser {
         //por enquanto, imprimindo apenas o título e adicionando na lista de url's visitadas, só pra testar
         try {
             doc = (Document) Jsoup.connect(url).get();
-            System.out.println(doc.title());
+            //System.out.println(doc.title());
             Elements links = doc.select("a[href]");
             for (Element link : links) {
-                System.out.println(link.attr("abs:href")+"  -  "+link.text().trim());
-                this.seeds.add(new Semente(link.attr("abs:href"), false));
+                //System.out.println(link.attr("abs:href")+"  -  "+link.text().trim());
+                //coloca as urls encontradas na lista de sementes
+                if(!seeds.contains(new Semente(link.attr("abs:href"), false)) && !seeds.contains(new Semente(link.attr("abs:href"), true)))
+                    this.seeds.add(new Semente(link.attr("abs:href"), false));//se nao existe coloca
             }
-            HashMap<String, Centroide> words = getCentroide(doc.text());
+            HashMap<String, Centroide> words = getCentroide();
             Site site = new Site(doc.title(),doc.text(),words.size(), numTermos, words);
-            sites.add(site);
-            this.seeds.add(new Semente(url, true));
+            sites.add(site);            
         } catch (IOException ex) {
             System.err.println("Erro: " + ex);
         }        
@@ -110,36 +119,35 @@ public class Parser {
         System.out.println(seeds.toString());
     }
     
-    private HashMap<String, Centroide> getCentroide(String txt){
+    private HashMap<String, Centroide> getCentroide(){
         HashMap<String, Centroide> words = new HashMap();
         numTermos = 0;
-        String palavras[] = txt.split("' '+|\\n+|\\t+|\\r+|\\.+|\\,+|\\;+|\\:+|\\(+|\\)+|#+|\"+|'+|[+|]+");
-                //+ "issimo|íssimo|issimos|íssimos|issima|íssima|issimas|íssimas|manha|manhã|noite|exemplo|minutos|segundos");
-        for(String str:palavras){
-            str =str.trim();
-            numTermos++;
-            Centroide cent = words.get(str);
-            Boolean stopLContains = stoplist.get(str);
-            if (stopLContains == null && str.isEmpty()){ //se nao está na stoplist
-                if(cent==null){//se não esta na lista de centroides
-                    cent = new Centroide(str, 0, 1);
-                    words.put(str, cent);
-                    System.out.println(str);
-                }else{// se já esta na lista de centroides, incrementa a ocorrencia
-                    cent.setOcorrencia(cent.getOcorrencia()+1);
-                    System.out.println(cent.getConteudo()+" - "+cent.getOcorrencia());
+        Elements es = doc.getAllElements();//receber um vetor de Strings das palavras que tem na tag html na posição i de tags
+        for (Element e:es){
+            //System.out.println(e.tag()+" - "+e.text());
+            String palavras[] = e.text().split("\\s+|\\n+|\\t+|\\r+|\\.+|\\,+|\\;+|\\:+|\\(+|\\)+|#+|\"+|'+|[+|]+");
+                    //+ "issimo|íssimo|issimos|íssimos|issima|íssima|issimas|íssimas|manha|manhã|noite|exemplo|minutos|segundos");
+            for(String str:palavras){
+                str =str.trim();
+                numTermos++;
+                Centroide cent = words.get(str);
+                Boolean stopLContains = stoplist.get(str);
+                if (stopLContains == null && !str.isEmpty()){ //se nao está na stoplist
+                    if(cent==null){//se não esta na lista de centroides
+                        int peso =0;
+                        if (tags.get(e.tagName())!=null)
+                            peso = tags.get(e.tagName());
+                        cent = new Centroide(str, peso, 1);
+                        words.put(str, cent);
+                    }else{// se já esta na lista de centroides, incrementa a ocorrencia
+                        cent.setOcorrencia(cent.getOcorrencia()+1);
+                        if(tags.get(e.tagName())!=null){
+                            cent.setPeso(cent.getPeso() + tags.get(e.tagName()));
+                        }                        
+                    }
+                    //System.out.println(e.tag()+""+cent.getConteudo()+" - "+cent.getOcorrencia()+" - "+cent.getPeso());
                 }
             }
-            //hasmap de words populada, vamos agora atribuir os pesos
-            for(int i=0;i<tags.length;i++){
-                Element e = doc.tagName("title");//receber um vetor de Strings das palavras que tem na tag html na posição i de tags
-                
-                //System.out.println(doc.absUrl("title"));
-                //checar cada palavra de retorno do metodo que pega az palavraz contidaz na tag
-                //checar na lizta de palavraz filtradaz, ze conter atribui o pezo
-                
-            }
-            //return centroide
         }
         return words;
     }

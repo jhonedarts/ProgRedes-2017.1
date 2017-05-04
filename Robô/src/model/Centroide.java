@@ -7,7 +7,7 @@ package model;
 
 /**
  *
- * @author Jhansen
+ * @author Jhansen Jhone
  */
 public class Centroide {
     private String conteudo;
