@@ -50,10 +50,27 @@ public class Parser {
         this.sites = new ArrayList<Site>();
         this.tags = new HashMap();
         tags.put("title", 10);
-        tags.put("h1", 3);
-        tags.put("h2", 3);
-        tags.put("span", 3);
-        tags.put("div", 1);
+        tags.put("h1", 7);
+        tags.put("h2", 6);
+        tags.put("h3", 5);
+        tags.put("h4", 4);
+        tags.put("h5", 4);
+        tags.put("h6", 4);
+        tags.put("a", 5);
+        tags.put("big", 3);
+        tags.put("b", 3);
+        tags.put("em", 3);
+        tags.put("i", 3);
+        tags.put("u", 3);
+        tags.put("strong", 3);
+        tags.put("strike", 3);
+        tags.put("center", 3);
+        tags.put("small", 2);
+        tags.put("sub", 2);
+        tags.put("sup", 2);
+        tags.put("font", 2);
+        tags.put("address", 2);
+        tags.put("meta", 2);        
     }
     /**
      * Método para abrir o arquivo XML e extrair as url's
@@ -137,13 +154,17 @@ public class Parser {
                         int peso =0;
                         if (tags.get(e.tagName())!=null)
                             peso = tags.get(e.tagName());
+                        else
+                            peso = 1;
                         cent = new Centroide(str, peso, 1);
                         words.put(str, cent);
                     }else{// se já esta na lista de centroides, incrementa a ocorrencia
                         cent.setOcorrencia(cent.getOcorrencia()+1);
                         if(tags.get(e.tagName())!=null){
                             cent.setPeso(cent.getPeso() + tags.get(e.tagName()));
-                        }                        
+                        }else{
+                            cent.setPeso(cent.getPeso() +1);
+                        }
                     }
                     //System.out.println(e.tag()+""+cent.getConteudo()+" - "+cent.getOcorrencia()+" - "+cent.getPeso());
                 }
