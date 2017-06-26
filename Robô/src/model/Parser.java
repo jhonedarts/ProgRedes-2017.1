@@ -6,9 +6,12 @@
 package model;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import org.jsoup.Jsoup;
@@ -18,17 +21,18 @@ import org.jsoup.select.Elements;
 
 /**
  *
- * @author Jhansen e Jhone
+ * @author Jhansen & Jhone
  */
 public class Parser {
-    private HashMap<String, Integer> tags;
-    private ArrayList<Site> sites;
+    private final HashMap<String, Integer> tags;
+    private final ArrayList<Site> sites;
     private Document doc;
-    private HashMap<String, Boolean> stoplist;//nem precisa da lista de seeds
+    private final HashMap<String, Boolean> stoplist;
     private final ArrayList<Semente> seeds;
     private int numTermos = 0;
+    
     public Parser() throws IOException{
-        BufferedReader sourceBr = new BufferedReader(new FileReader(new File("stoplist.txt"))); //tem que ler em UTF-8
+        BufferedReader sourceBr = new BufferedReader(new FileReader(new File("stoplist.txt")));
         String line;
         stoplist = new HashMap();
         while ((line = sourceBr.readLine()) != null) {
@@ -41,13 +45,13 @@ public class Parser {
         sourceBr = new BufferedReader(new FileReader(new File("stoplistEn.txt")));
         while ((line = sourceBr.readLine()) != null) {
             line = line.trim();
-            if(!line.equals("")){//linha vazia
+            if(!line.equals("")){
                 stoplist.put(line, Boolean.FALSE);
             }
         }
         sourceBr.close();
         this.seeds = new ArrayList<>();
-        this.sites = new ArrayList<Site>();
+        this.sites = new ArrayList<>();
         this.tags = new HashMap();
         tags.put("title", 10);
         tags.put("h1", 7);
@@ -89,7 +93,6 @@ public class Parser {
                         linha = linha.replace("</url>", "");
                         linha = linha.trim();
                         seeds.add(new Semente(linha, false));
-                        //System.out.println(linha);
                     }
                 }
             }
@@ -102,24 +105,22 @@ public class Parser {
             parserHTML(seeds.get(index).getUrl());  
             seeds.get(index).setVisitado(true);
             System.out.println(seeds.get(index).getUrl()+" - visitado");
-            if(index==4){
+            if(index == 30){
+                System.err.println(sites.toString());
                 break;
             }
         }
-        //salvar sites em xml, ou bin se nada der certo
+        this.gravar();
     }
     /**
      * Método responsável por fazer o parser na página HTML
      * @param url 
      */
     public void parserHTML(String url){
-        //por enquanto, imprimindo apenas o título e adicionando na lista de url's visitadas, só pra testar
         try {
             doc = (Document) Jsoup.connect(url).get();
-            //System.out.println(doc.title());
             Elements links = doc.select("a[href]");
             for (Element link : links) {
-                //System.out.println(link.attr("abs:href")+"  -  "+link.text().trim());
                 //coloca as urls encontradas na lista de sementes
                 if(!seeds.contains(new Semente(link.attr("abs:href"), false)) && !seeds.contains(new Semente(link.attr("abs:href"), true)))
                     this.seeds.add(new Semente(link.attr("abs:href"), false));//se nao existe coloca
@@ -133,7 +134,7 @@ public class Parser {
     }
     
     public void imprimeLista(){
-        System.out.println(seeds.toString());
+        System.err.println(seeds.toString());
     }
     
     private HashMap<String, Centroide> getCentroide(){
@@ -166,10 +167,40 @@ public class Parser {
                             cent.setPeso(cent.getPeso() +1);
                         }
                     }
-                    //System.out.println(e.tag()+""+cent.getConteudo()+" - "+cent.getOcorrencia()+" - "+cent.getPeso());
+                    //System.out.println(e.tag()+" - "+cent.getConteudo()+" - "+cent.getOcorrencia()+" - "+cent.getPeso());
                 }
             }
         }
         return words;
+    }
+    
+    private void gravar(){
+        try {
+            Writer arquivo = new FileWriter("Sementes.xml");
+            BufferedWriter gravar = new BufferedWriter(arquivo);
+            arquivo.write("<seeds>\n");
+            for(Semente x : seeds){
+                arquivo.write("\t<url>"+x.getUrl()+"</url>\n");
+            }
+            arquivo.write("</seeds>");
+            gravar.close();
+            arquivo.close();
+            
+            for(Site x : sites){
+                Writer arquivo2 = new FileWriter(x.getTitulo()+".xml");
+                BufferedWriter gravar2 = new BufferedWriter(arquivo2);
+                arquivo2.write("<raiz>\n");
+                arquivo2.write("\t<qtdTermo>"+x.getNumTermos()+"</qtdTermo>\n");
+                arquivo2.write("\t<qtdTermoDif>"+x.getNumTermosDif()+"</qtdTermoDif>\n");
+                arquivo2.write("\t<titulo>"+x.getTitulo()+"</titulo>\n");
+                arquivo2.write("\t<texto>"+x.getTexto()+"</texto>\n");
+                arquivo2.write("\t"+x.toString());
+                arquivo2.write("</raiz>");
+                gravar2.close();
+                arquivo2.close();
+            }
+        } catch (IOException ex) {
+            System.err.println("Erro: " + ex);
+        }
     }
 }

@@ -10,7 +10,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Jhansen e Jhone
+ * @author Jhansen & Jhone
  */
 public class Site {
     private String titulo;
@@ -30,8 +30,6 @@ public class Site {
     public Site() {
     }
     
-    
-
     public String getTitulo() {
         return titulo;
     }
@@ -71,6 +69,9 @@ public class Site {
     public void setCentroide(HashMap<String, Centroide> centroide) {
         this.termos = centroide;
     }
-    
-    
+
+    @Override
+    public String toString() {
+        return termos.toString();
+    }
 }

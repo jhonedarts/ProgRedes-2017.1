@@ -6,13 +6,11 @@
 package principal;
 
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import model.Parser;
 
 /**
  *
- * @author Jhansen e Jhone
+ * @author Jhansen & Jhone
  */
 public class Main {
     public static void main(String[] args) {
@@ -20,9 +18,8 @@ public class Main {
         try {
             p = new Parser();
             p.init();
-        } catch (IOException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex){
+            System.out.println("Erro: " + ex);
         }
-        
     }
 }

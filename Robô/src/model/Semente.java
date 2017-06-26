@@ -9,7 +9,7 @@ import java.util.Objects;
 
 /**
  *
- * @author Jhansen e Jhone
+ * @author Jhansen & Jhone
  */
 public class Semente {
     private final String url;
@@ -61,9 +61,8 @@ public class Semente {
         return true;
     }
     
-    
     @Override
     public String toString(){
-        return url + " " + visitado;
+        return url + " " + visitado + "\n";
     }
 }

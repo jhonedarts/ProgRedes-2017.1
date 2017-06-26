@@ -7,7 +7,7 @@ package model;
 
 /**
  *
- * @author Jhansen Jhone
+ * @author Jhansen & Jhone
  */
 public class Centroide {
     private String conteudo;
@@ -43,6 +43,9 @@ public class Centroide {
     public void setOcorrencia(int ocorrencia) {
         this.ocorrencia = ocorrencia;
     }
-    
-    
+
+    @Override
+    public String toString() {
+        return "<termo>" + conteudo + " - " + ocorrencia + " - " + peso + "</termo>\n";
+    }
 }
