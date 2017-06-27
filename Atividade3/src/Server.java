@@ -23,6 +23,7 @@ public class Server{
       this.num = num;
       this.socket = clientSocket;
     }
+    @Override
     public void run(){
       try{
         int min = 0;

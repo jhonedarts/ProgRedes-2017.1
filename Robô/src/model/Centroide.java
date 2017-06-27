@@ -10,22 +10,22 @@ package model;
  * @author Jhansen & Jhone
  */
 public class Centroide {
-    private String conteudo;
+    private String termo;
     private int peso;
     private int ocorrencia;
 
-    public Centroide(String conteudo, int peso, int ocorrencia) {
-        this.conteudo = conteudo;
+    public Centroide(String termo, int peso, int ocorrencia) {
+        this.termo = termo;
         this.peso = peso;
         this.ocorrencia = ocorrencia;
     }
 
-    public String getConteudo() {
-        return conteudo;
+    public String getTermo() {
+        return termo;
     }
 
-    public void setConteudo(String conteudo) {
-        this.conteudo = conteudo;
+    public void setTermo(String termo) {
+        this.termo = termo;
     }
 
     public int getPeso() {
@@ -46,6 +46,6 @@ public class Centroide {
 
     @Override
     public String toString() {
-        return "<termo>" + conteudo + " - " + ocorrencia + " - " + peso + "</termo>\n";
+        return "<termo>" + termo + " - " + ocorrencia + " - " + peso + "</termo>\n";
     }
 }

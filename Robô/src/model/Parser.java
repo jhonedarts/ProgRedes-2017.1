@@ -29,12 +29,14 @@ public class Parser implements Runnable{
     private final HashMap<String, Integer> tags;
     private final ArrayList<Site> sites;
     private Document doc;
-    private final HashMap<String, Boolean> stoplist;
+    private HashMap<String, List<Invertida>> invertidas; //termo - lista(site,peso); ex: "arroz" - <uefs.br, 12>
+    private final HashMap<String, Boolean> stoplist;    
     private List<Semente> seeds;
     private int numTermos = 0;
     
-    public Parser(List<Semente> seeds) throws IOException{
+    public Parser(List<Semente> seeds, HashMap<String, List<Invertida>> invertidas) throws IOException{
         this.seeds = seeds;
+        this.invertidas = invertidas;
         BufferedReader sourceBr = new BufferedReader(new FileReader(new File("stoplist.txt")));
         String line;
         stoplist = new HashMap();
@@ -53,7 +55,6 @@ public class Parser implements Runnable{
             }
         }
         sourceBr.close();
-        this.seeds = new ArrayList<>();
         this.sites = new ArrayList<>();
         this.tags = new HashMap();
         tags.put("title", 10);
@@ -112,6 +113,19 @@ public class Parser implements Runnable{
                     this.seeds.add(new Semente(link.attr("abs:href"), false));//se nao existe coloca
             }
             HashMap<String, Centroide> words = getCentroide();
+            //atribuindo novos termos a lista invertida
+            for (String key : words.keySet()){
+                Centroide c = words.get(key);
+                if(!invertidas.containsKey(c.getTermo())){ //se nao tem, cria o termo e inicia a lista
+                    List<Invertida> lista = new ArrayList<>();
+                    Invertida inv = new Invertida(key, c.getPeso()); // site, peso
+                    lista.add(inv);
+                    invertidas.put(c.getTermo(), lista);
+                }else{ // se o termo já existe, adiciona na lista invertida
+                    Invertida inv = new Invertida(key, c.getPeso()); // site, peso
+                    invertidas.get(c.getTermo()).add(inv);
+                }
+            }
             Site site = new Site(doc.title(),doc.text(),words.size(), numTermos, words);
             sites.add(site);            
         } catch (IOException ex) {
@@ -159,19 +173,9 @@ public class Parser implements Runnable{
         }
         return words;
     }
-    
     private void gravar(){
-        try {
-            Writer arquivo = new FileWriter("Sementes.xml");
-            BufferedWriter gravar = new BufferedWriter(arquivo);
-            arquivo.write("<seeds>\n");
-            for(Semente x : seeds){
-                arquivo.write("\t<url>"+x.getUrl()+"</url>\n");
-            }
-            arquivo.write("</seeds>");
-            gravar.close();
-            arquivo.close();
-            
+        try{
+
             for(Site x : sites){
                 Writer arquivo2 = new FileWriter(x.getTitulo()+".xml");
                 BufferedWriter gravar2 = new BufferedWriter(arquivo2);
@@ -188,5 +192,8 @@ public class Parser implements Runnable{
         } catch (IOException ex) {
             System.err.println("Erro: " + ex);
         }
+    }
+    public HashMap<String, List<Invertida>> getInvertidas(){
+        return invertidas;
     }
 }
