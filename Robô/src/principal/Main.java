@@ -5,8 +5,12 @@
  */
 package principal;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import model.Parser;
+import model.Semente;
 
 /**
  *
@@ -15,9 +19,30 @@ import model.Parser;
 public class Main {
     public static void main(String[] args) {
         Parser p;
+        ArrayList<Semente> seeds = new ArrayList<>();
         try {
-            p = new Parser();
-            p.init();
+            String linha;
+            try {
+                BufferedReader lerXML;
+                try(FileReader f = new FileReader("Sementes.xml")){
+                    lerXML = new BufferedReader(f);
+                    while(lerXML.ready()){
+                        linha = lerXML.readLine();
+                        if(linha.contains("<url>")){
+                            linha = linha.replace("<url>", "");
+                            linha = linha.replace("</url>", "");
+                            linha = linha.trim();
+                            seeds.add(new Semente(linha, false));
+                        }
+                    }
+                }
+                lerXML.close();
+            } catch (IOException e) {
+                System.err.println("Erro: " + e);
+            }
+            (new Thread(new Parser(seeds.subList(0, 10)))).start();
+            (new Thread(new Parser(seeds.subList(10, 20)))).start();
+            (new Thread(new Parser(seeds.subList(20, 30)))).start();
         } catch (IOException ex){
             System.out.println("Erro: " + ex);
         }

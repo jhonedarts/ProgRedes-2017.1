@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -23,15 +24,17 @@ import org.jsoup.select.Elements;
  *
  * @author Jhansen & Jhone
  */
-public class Parser {
+public class Parser implements Runnable{
+    private int stop = 30;
     private final HashMap<String, Integer> tags;
     private final ArrayList<Site> sites;
     private Document doc;
     private final HashMap<String, Boolean> stoplist;
-    private final ArrayList<Semente> seeds;
+    private List<Semente> seeds;
     private int numTermos = 0;
     
-    public Parser() throws IOException{
+    public Parser(List<Semente> seeds) throws IOException{
+        this.seeds = seeds;
         BufferedReader sourceBr = new BufferedReader(new FileReader(new File("stoplist.txt")));
         String line;
         stoplist = new HashMap();
@@ -80,32 +83,15 @@ public class Parser {
      * Método para abrir o arquivo XML e extrair as url's
      * Cada url extraída é enviada pro método parserHTML()
      */
-    public void init(){
-        String linha;
-        try {
-            BufferedReader lerXML;
-            try(FileReader f = new FileReader("Sementes.xml")){
-                lerXML = new BufferedReader(f);
-                while(lerXML.ready()){
-                    linha = lerXML.readLine();
-                    if(linha.contains("<url>")){
-                        linha = linha.replace("<url>", "");
-                        linha = linha.replace("</url>", "");
-                        linha = linha.trim();
-                        seeds.add(new Semente(linha, false));
-                    }
-                }
-            }
-            lerXML.close();
-        } catch (IOException e) {
-            System.err.println("Erro: " + e);
-        }
+    @Override
+    public void run(){
+        
         
         for (int index = 0; index < seeds.size(); index++) {
             parserHTML(seeds.get(index).getUrl());  
             seeds.get(index).setVisitado(true);
             System.out.println(seeds.get(index).getUrl()+" - visitado");
-            if(index == 30){
+            if(index == stop){
                 System.err.println(sites.toString());
                 break;
             }
