@@ -19,6 +19,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import principal.Main;
 
 /**
  *
@@ -34,10 +35,10 @@ public class Parser implements Runnable{
     private List<Semente> seeds;
     private int numTermos = 0;
     
-    public Parser(List<Semente> seeds, HashMap<String, List<Invertida>> invertidas) throws IOException{
+    public Parser(List<Semente> seeds) throws IOException{
         this.seeds = seeds;
-        this.invertidas = invertidas;
-        BufferedReader sourceBr = new BufferedReader(new FileReader(new File("stoplist.txt")));
+        this.invertidas = new HashMap<>();
+        BufferedReader sourceBr = new BufferedReader(new FileReader(new File("out/stoplist.txt")));
         String line;
         stoplist = new HashMap();
         while ((line = sourceBr.readLine()) != null) {
@@ -47,7 +48,7 @@ public class Parser implements Runnable{
             }
         }
         sourceBr.close();
-        sourceBr = new BufferedReader(new FileReader(new File("stoplistEn.txt")));
+        sourceBr = new BufferedReader(new FileReader(new File("out/stoplistEn.txt")));
         while ((line = sourceBr.readLine()) != null) {
             line = line.trim();
             if(!line.equals("")){
@@ -91,9 +92,9 @@ public class Parser implements Runnable{
         for (int index = 0; index < seeds.size(); index++) {
             parserHTML(seeds.get(index).getUrl());  
             seeds.get(index).setVisitado(true);
-            System.out.println(seeds.get(index).getUrl()+" - visitado");
+            System.out.println(index+" "+seeds.get(index).getUrl()+" - visitado");
             if(index == stop){
-                System.err.println(sites.toString());
+                //System.err.println(sites.toString());
                 break;
             }
         }
@@ -128,15 +129,11 @@ public class Parser implements Runnable{
             }
             Site site = new Site(doc.title(),doc.text(),words.size(), numTermos, words);
             sites.add(site);            
-        } catch (IOException ex) {
-            System.err.println("Erro: " + ex);
+        } catch (IOException | IllegalArgumentException ex) {
+           // System.err.println("Erro: " + ex);
         }        
     }
-    
-    public void imprimeLista(){
-        System.err.println(seeds.toString());
-    }
-    
+        
     private HashMap<String, Centroide> getCentroide(){
         HashMap<String, Centroide> words = new HashMap();
         numTermos = 0;
@@ -175,9 +172,8 @@ public class Parser implements Runnable{
     }
     private void gravar(){
         try{
-
             for(Site x : sites){
-                Writer arquivo2 = new FileWriter(x.getTitulo()+".xml");
+                Writer arquivo2 = new FileWriter("out/centroides/"+x.getTitulo()+".xml");
                 BufferedWriter gravar2 = new BufferedWriter(arquivo2);
                 arquivo2.write("<raiz>\n");
                 arquivo2.write("\t<qtdTermo>"+x.getNumTermos()+"</qtdTermo>\n");
@@ -192,8 +188,7 @@ public class Parser implements Runnable{
         } catch (IOException ex) {
             System.err.println("Erro: " + ex);
         }
-    }
-    public HashMap<String, List<Invertida>> getInvertidas(){
-        return invertidas;
+        System.out.println("GRAVOU");
+        Main.gravar(seeds, invertidas);
     }
 }
