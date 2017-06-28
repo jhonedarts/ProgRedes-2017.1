@@ -26,6 +26,7 @@ import principal.Main;
  * @author Jhansen & Jhone
  */
 public class Parser implements Runnable{
+    private String dominio;
     private int stop = 30;
     private final HashMap<String, Integer> tags;
     private final ArrayList<Site> sites;
@@ -35,8 +36,9 @@ public class Parser implements Runnable{
     private List<Semente> seeds;
     private int numTermos = 0;
     
-    public Parser(List<Semente> seeds) throws IOException{
+    public Parser(List<Semente> seeds, String dominio) throws IOException{
         this.seeds = seeds;
+        this.dominio = dominio;
         this.invertidas = new HashMap<>();
         BufferedReader sourceBr = new BufferedReader(new FileReader(new File("out/stoplist.txt")));
         String line;
@@ -88,15 +90,12 @@ public class Parser implements Runnable{
     @Override
     public void run(){
         
-        
-        for (int index = 0; index < seeds.size(); index++) {
+        //O robo visita a quantidade de semetes definida por stop
+        for (int index = 0; index < stop; index++) {
             parserHTML(seeds.get(index).getUrl());  
             seeds.get(index).setVisitado(true);
             System.out.println(index+" "+seeds.get(index).getUrl()+" - visitado");
-            if(index == stop){
-                //System.err.println(sites.toString());
-                break;
-            }
+            
         }
         this.gravar();
     }
@@ -119,15 +118,16 @@ public class Parser implements Runnable{
                 Centroide c = words.get(key);
                 if(!invertidas.containsKey(c.getTermo())){ //se nao tem, cria o termo e inicia a lista
                     List<Invertida> lista = new ArrayList<>();
-                    Invertida inv = new Invertida(key, c.getPeso()); // site, peso
+                    Invertida inv = new Invertida(url, c.getPeso()); // site, peso
                     lista.add(inv);
                     invertidas.put(c.getTermo(), lista);
                 }else{ // se o termo já existe, adiciona na lista invertida
-                    Invertida inv = new Invertida(key, c.getPeso()); // site, peso
+                    Invertida inv = new Invertida(url, c.getPeso()); // site, peso
                     invertidas.get(c.getTermo()).add(inv);
                 }
             }
             Site site = new Site(doc.title(),doc.text(),words.size(), numTermos, words);
+            site.dominio(dominio);
             sites.add(site);            
         } catch (IOException | IllegalArgumentException ex) {
            // System.err.println("Erro: " + ex);
@@ -173,7 +173,8 @@ public class Parser implements Runnable{
     private void gravar(){
         try{
             for(Site x : sites){
-                Writer arquivo2 = new FileWriter("out/centroides/"+x.getTitulo()+".xml");
+                
+                Writer arquivo2 = new FileWriter("out/centroides/"+x.getTitulo().replaceAll("[^a-zZ-Z1-9 ]", "")+".xml");
                 BufferedWriter gravar2 = new BufferedWriter(arquivo2);
                 arquivo2.write("<raiz>\n");
                 arquivo2.write("\t<qtdTermo>"+x.getNumTermos()+"</qtdTermo>\n");

@@ -28,6 +28,7 @@ public class Main {
     private static int count=0;
     public static void main(String[] args) {
         Parser p;
+        String dominio = "futebol";
         int roboDiv=10;
         
         
@@ -51,9 +52,9 @@ public class Main {
             } catch (IOException e) {
                 System.err.println("Erro: " + e);
             }
-            (new Thread(new Parser(new ArrayList(seeds.subList(0, roboDiv))))).start();
-            (new Thread(new Parser(new ArrayList(seeds.subList(roboDiv, roboDiv * 2))))).start();
-            (new Thread(new Parser(new ArrayList(seeds.subList(roboDiv *2, roboDiv *3))))).start();
+            (new Thread(new Parser(new ArrayList(seeds.subList(0, roboDiv)), dominio))).start();
+            (new Thread(new Parser(new ArrayList(seeds.subList(roboDiv, roboDiv * 2)), dominio))).start();
+            (new Thread(new Parser(new ArrayList(seeds.subList(roboDiv *2, roboDiv *3)), dominio))).start();
         } catch (IOException ex){
             System.out.println("Erro: " + ex);
         }
@@ -96,7 +97,7 @@ public class Main {
                     List <Invertida> list = invertidas.get(key);
                     arquivo.write("\n\t"+key+"\n");
                     for(Invertida inv: list){
-                        arquivo.write("<"+inv.getSite()+" ,"+inv.getPeso()+">, ");
+                        arquivo.write("<"+inv.getSite().hashCode()+" ,"+inv.getPeso()+">, ");
                     }
                 }
                 arquivo.write("</lista invertida>");

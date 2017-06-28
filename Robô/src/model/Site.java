@@ -14,6 +14,7 @@ import java.util.HashMap;
  */
 public class Site {
     private String titulo;
+    private boolean dominio;
     private String texto;
     private int numTermosDif;
     private int numTermos;
@@ -21,6 +22,7 @@ public class Site {
 
     public Site(String titulo, String texto, int numTermosDif, int numTermos, HashMap<String, Centroide> termos) {
         this.titulo = titulo;
+        this.dominio = false;
         this.texto = texto;
         this.numTermosDif = numTermosDif;
         this.numTermos = numTermos;
@@ -68,6 +70,19 @@ public class Site {
 
     public void setCentroide(HashMap<String, Centroide> centroide) {
         this.termos = centroide;
+    }
+    
+    public void dominio(String dominio){
+        for(String x : termos.keySet()){
+            if(x.equalsIgnoreCase(dominio)){
+                this.dominio = true;
+                break;
+            }
+        }
+    }
+    
+    public boolean getDominio(){
+        return dominio;
     }
 
     @Override
