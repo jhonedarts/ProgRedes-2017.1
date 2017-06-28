@@ -65,7 +65,7 @@ public class Main {
     public synchronized static void gravar(List<Semente> seedsNew, HashMap<String, List<Invertida>> invertidasNew){
         seeds.addAll(seedsNew);
         if(invertidas.isEmpty()){
-            invertidas.putAll(invertidas);
+            invertidas.putAll(invertidasNew);
         }else{
             for (String key: invertidas.keySet()){
                 List<Invertida> lis = invertidasNew.get(key);
