@@ -27,6 +27,7 @@ import principal.Main;
  */
 public class Parser implements Runnable{
     private String dominio;
+    private boolean isDominio;
     private int stop = 30;
     private final HashMap<String, Integer> tags;
     private final ArrayList<Site> sites;
@@ -38,6 +39,7 @@ public class Parser implements Runnable{
     
     public Parser(List<Semente> seeds, String dominio) throws IOException{
         this.seeds = seeds;
+        this.isDominio = false;
         this.dominio = dominio;
         this.invertidas = new HashMap<>();
         BufferedReader sourceBr = new BufferedReader(new FileReader(new File("out/stoplist.txt")));
@@ -129,7 +131,8 @@ public class Parser implements Runnable{
             Site site = new Site(doc.title(),doc.text(),words.size(), numTermos, words);
             site.dominio(dominio);
             if (isDominio)
-                sites.add(site);            
+                sites.add(site);
+            isDominio = false;
         } catch (IOException | IllegalArgumentException ex) {
            // System.err.println("Erro: " + ex);
         }        

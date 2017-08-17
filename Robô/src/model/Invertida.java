@@ -25,6 +25,10 @@ public class Invertida {
     public int getPeso() {
         return peso;
     }
+
+    public void setPeso(int i) {
+        this.peso = i;
+    }
     
 }
 
