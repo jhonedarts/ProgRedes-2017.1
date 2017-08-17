@@ -9,12 +9,12 @@ package model;
  *
  * @author Jhansen & Jhone
  */
-public class Centroide {
+public class Termo {
     private String termo;
     private int peso;
     private int ocorrencia;
 
-    public Centroide(String termo, int peso, int ocorrencia) {
+    public Termo(String termo, int peso, int ocorrencia) {
         this.termo = termo;
         this.peso = peso;
         this.ocorrencia = ocorrencia;

@@ -26,7 +26,13 @@ public class Main {
     private static ArrayList<Semente> seeds = new ArrayList<>();
     private static HashMap<String, List<Invertida>> invertidas = new HashMap<>(); //termo - lista(site,peso); ex: "arroz" - <uefs.br, 12>
     private static int count=0;
+    
+    private static HashMap<String, Integer> sitesL = new HashMap<>();
+    private static HashMap<Integer, String> sitesLI = new HashMap<>();
+    private static int ct=0;
+    
     public static void main(String[] args) {
+        
         Parser p;
         String dominio = "futebol";
         int roboDiv=10;
@@ -94,10 +100,16 @@ public class Main {
                 gravar = new BufferedWriter(arquivo);
                 arquivo.write("<lista invertida>");
                 for(String key: invertidas.keySet()){
+                    
                     List <Invertida> list = invertidas.get(key);
                     arquivo.write("\n\t"+key+"\n");
                     for(Invertida inv: list){
-                        arquivo.write("<"+inv.getSite().hashCode()+" ,"+inv.getPeso()+">, ");
+                        if (!sitesL.containsKey(inv.getSite())){
+                            sitesL.put(key, ct);
+                            sitesLI.put(ct, key);
+                            ct++;
+                        }
+                        arquivo.write("<"+sitesL.get(inv.getSite())+" ,"+inv.getPeso()+">, ");
                     }
                 }
                 arquivo.write("</lista invertida>");

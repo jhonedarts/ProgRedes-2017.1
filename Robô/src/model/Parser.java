@@ -112,10 +112,10 @@ public class Parser implements Runnable{
                 if(!seeds.contains(new Semente(link.attr("abs:href"), false)) && !seeds.contains(new Semente(link.attr("abs:href"), true)))
                     this.seeds.add(new Semente(link.attr("abs:href"), false));//se nao existe coloca
             }
-            HashMap<String, Centroide> words = getCentroide();
+            HashMap<String, Termo> words = getCentroide();
             //atribuindo novos termos a lista invertida
             for (String key : words.keySet()){
-                Centroide c = words.get(key);
+                Termo c = words.get(key);
                 if(!invertidas.containsKey(c.getTermo())){ //se nao tem, cria o termo e inicia a lista
                     List<Invertida> lista = new ArrayList<>();
                     Invertida inv = new Invertida(url, c.getPeso()); // site, peso
@@ -128,14 +128,15 @@ public class Parser implements Runnable{
             }
             Site site = new Site(doc.title(),doc.text(),words.size(), numTermos, words);
             site.dominio(dominio);
-            sites.add(site);            
+            if (isDominio)
+                sites.add(site);            
         } catch (IOException | IllegalArgumentException ex) {
            // System.err.println("Erro: " + ex);
         }        
     }
         
-    private HashMap<String, Centroide> getCentroide(){
-        HashMap<String, Centroide> words = new HashMap();
+    private HashMap<String, Termo> getCentroide(){
+        HashMap<String, Termo> words = new HashMap();
         numTermos = 0;
         Elements es = doc.getAllElements();//receber um vetor de Strings das palavras que tem na tag html na posição i de tags
         for (Element e:es){
@@ -145,7 +146,7 @@ public class Parser implements Runnable{
             for(String str:palavras){
                 str =str.trim();
                 numTermos++;
-                Centroide cent = words.get(str);
+                Termo cent = words.get(str);
                 Boolean stopLContains = stoplist.get(str);
                 if (stopLContains == null && !str.isEmpty()){ //se nao está na stoplist
                     if(cent==null){//se não esta na lista de centroides
@@ -154,8 +155,10 @@ public class Parser implements Runnable{
                             peso = tags.get(e.tagName());
                         else
                             peso = 1;
-                        cent = new Centroide(str, peso, 1);
+                        cent = new Termo(str, peso, 1);
                         words.put(str, cent);
+                        if(str.equalsIgnoreCase(dominio))
+                            isDominio = true;
                     }else{// se já esta na lista de centroides, incrementa a ocorrencia
                         cent.setOcorrencia(cent.getOcorrencia()+1);
                         if(tags.get(e.tagName())!=null){

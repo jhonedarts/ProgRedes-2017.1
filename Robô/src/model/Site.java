@@ -18,9 +18,9 @@ public class Site {
     private String texto;
     private int numTermosDif;
     private int numTermos;
-    HashMap<String, Centroide> termos;
+    HashMap<String, Termo> termos;
 
-    public Site(String titulo, String texto, int numTermosDif, int numTermos, HashMap<String, Centroide> termos) {
+    public Site(String titulo, String texto, int numTermosDif, int numTermos, HashMap<String, Termo> termos) {
         this.titulo = titulo;
         this.dominio = false;
         this.texto = texto;
@@ -64,11 +64,11 @@ public class Site {
         this.numTermos = numTermos;
     }
 
-    public HashMap<String, Centroide> getCentroide() {
+    public HashMap<String, Termo> getCentroide() {
         return termos;
     }
 
-    public void setCentroide(HashMap<String, Centroide> centroide) {
+    public void setCentroide(HashMap<String, Termo> centroide) {
         this.termos = centroide;
     }
     
